@@ -12,16 +12,8 @@ import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Debug middleware
-const debugAuth = (req, res, next) => {
-  console.log('Auth Debug - Headers:', req.headers);
-  console.log('Auth Debug - User:', req.user);
-  next();
-};
-
 // All routes need authentication
 router.use(authenticateToken);
-router.use(debugAuth); // Add debug middleware
 
 // Project CRUD routes
 router.post('/', createProject);

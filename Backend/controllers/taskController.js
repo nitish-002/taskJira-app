@@ -3,6 +3,8 @@ import Project from '../models/projectModel.js';
 import User from '../models/userModel.js';
 import { processTaskAutomations } from '../services/automationService.js';
 import { getIO } from '../websocket/socketServer.js';
+import { sendTaskAssignment } from '../services/emailService.js';
+import { isAuthorizedForTask } from '../utils/taskUtils.js';
 
 // Create a new task
 export const createTask = async (req, res) => {
@@ -16,10 +18,10 @@ export const createTask = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
     
-    // Verify that user is a member of the project
-    const isMember = project.members.some(member => member.userId === uid);
-    if (!isMember) {
-      return res.status(403).json({ message: 'Access denied. You are not a member of this project.' });
+    // Verify that user is a project owner
+    const userMember = project.members.find(member => member.userId === uid);
+    if (!userMember || userMember.role !== 'owner') {
+      return res.status(403).json({ message: 'Access denied. Only project owners can create tasks.' });
     }
     
     // Verify the status is valid for the project
@@ -57,6 +59,31 @@ export const createTask = async (req, res) => {
     });
     
     await task.save();
+    
+    // Send email notification to assignee if task is assigned
+    if (assigneeData) {
+      try {
+        // Get the creator's name
+        const creator = await User.findOne({ uid });
+        
+        // Generate task link
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const taskLink = `${frontendUrl}/projects/${projectId}?task=${task._id}`;
+        
+        await sendTaskAssignment({
+          email: assigneeData.email,
+          taskTitle: task.title,
+          projectName: project.title,
+          assignerName: creator ? creator.name : 'A team member',
+          dueDate: task.dueDate,
+          taskLink
+        });
+        console.log(`Task assignment email sent to ${assigneeData.email}`);
+      } catch (emailError) {
+        console.error('Error sending task assignment email:', emailError);
+        // Don't fail the request if email sending fails
+      }
+    }
     
     // Emit real-time update via WebSocket
     const io = getIO();
@@ -144,43 +171,29 @@ export const updateTask = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
     
-    // Verify that user is a member of the project
-    const isMember = project.members.some(member => member.userId === uid);
-    if (!isMember) {
-      return res.status(403).json({ message: 'Access denied. You are not a member of this project.' });
-    }
+    // Check if user is the task assignee or project owner
+    const userMember = project.members.find(member => member.userId === uid);
+    const isProjectOwner = userMember && userMember.role === 'owner';
     
-    // Verify the status is valid for the project if provided
-    if (status && !project.statuses.includes(status)) {
-      return res.status(400).json({ 
-        message: 'Invalid status. Must be one of the project statuses.',
-        validStatuses: project.statuses
-      });
-    }
-    
-    // Find the assignee if provided by email
-    let assigneeData = null;
-    if (assignee) {
-      // Check if the assignee email is a project member
-      const assigneeMember = project.members.find(member => member.email === assignee);
-      
-      if (!assigneeMember) {
-        return res.status(400).json({ message: 'Assignee must be a member of the project.' });
-      }
-      
-      assigneeData = {
-        userId: assigneeMember.userId,
-        email: assigneeMember.email
-      };
+    // Only project owners can update most task details
+    if (!isProjectOwner) {
+      return res.status(403).json({ message: 'Access denied. Only project owners can update task details.' });
     }
     
     // Save the previous state for automation comparison
     const previousTask = { ...task.toObject() };
     
+    // Check if assignee is changing
+    const isAssigneeChanging = assignee !== undefined && 
+      (!task.assignee || task.assignee.email !== assignee);
+    
     // Update task fields
     if (title) task.title = title;
     if (description !== undefined) task.description = description;
     if (status) task.status = status;
+    
+    // Handle assignee update
+    let newAssigneeData = null;
     if (assignee !== undefined) {
       if (assignee) {
         // Check if the assignee email is a project member
@@ -190,18 +203,45 @@ export const updateTask = async (req, res) => {
           return res.status(400).json({ message: 'Assignee must be a member of the project.' });
         }
         
-        task.assignee = {
+        newAssigneeData = {
           userId: assigneeMember.userId,
           email: assigneeMember.email
         };
+        task.assignee = newAssigneeData;
       } else {
         task.assignee = null;
       }
     }
+    
     if (dueDate !== undefined) task.dueDate = dueDate;
     task.updatedAt = Date.now();
     
     await task.save();
+    
+    // Send email notification if assignee was changed
+    if (isAssigneeChanging && newAssigneeData) {
+      try {
+        // Get the assigner's name
+        const assigner = await User.findOne({ uid });
+        
+        // Generate task link
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const taskLink = `${frontendUrl}/projects/${task.projectId}?task=${task._id}`;
+        
+        await sendTaskAssignment({
+          email: newAssigneeData.email,
+          taskTitle: task.title,
+          projectName: project.title,
+          assignerName: assigner ? assigner.name : 'A team member',
+          dueDate: task.dueDate,
+          taskLink
+        });
+        console.log(`Task assignment email sent to ${newAssigneeData.email}`);
+      } catch (emailError) {
+        console.error('Error sending task assignment email:', emailError);
+        // Don't fail the request if email sending fails
+      }
+    }
     
     // Process automations
     await processTaskAutomations(task, previousTask);
@@ -224,6 +264,8 @@ export const updateTaskStatus = async (req, res) => {
     const { status } = req.body;
     const { uid } = req.user;
     
+    console.log(`User ${uid} attempting to update task ${taskId} to status: ${status}`);
+    
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
@@ -235,12 +277,14 @@ export const updateTaskStatus = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
     
-    // Verify that user is a member of the project
-    const isMember = project.members.some(member => member.userId === uid);
-    if (!isMember) {
-      return res.status(403).json({ message: 'Access denied. You are not a member of this project.' });
+    // Check if user is authorized (project owner, task assignee, or project member)
+    if (!isAuthorizedForTask(task, project, uid)) {
+      console.log('Authorization failed for user:', uid);
+      return res.status(403).json({ 
+        message: 'Access denied. Only project members can update task status.'
+      });
     }
-    
+
     // Verify the status is valid for the project
     if (!project.statuses.includes(status)) {
       return res.status(400).json({ 
@@ -256,6 +300,7 @@ export const updateTaskStatus = async (req, res) => {
     task.updatedAt = Date.now();
     
     await task.save();
+    console.log(`Task ${taskId} status updated to ${status}`);
     
     // Process automations
     await processTaskAutomations(task, previousTask);
@@ -288,10 +333,10 @@ export const deleteTask = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
     
-    // Verify that user is a member of the project
-    const isMember = project.members.some(member => member.userId === uid);
-    if (!isMember) {
-      return res.status(403).json({ message: 'Access denied. You are not a member of this project.' });
+    // Only project owners can delete tasks
+    const userMember = project.members.find(member => member.userId === uid);
+    if (!userMember || userMember.role !== 'owner') {
+      return res.status(403).json({ message: 'Access denied. Only project owners can delete tasks.' });
     }
     
     await Task.findByIdAndDelete(taskId);

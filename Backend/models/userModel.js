@@ -63,6 +63,11 @@ userSchema.pre('save', function(next) {
   next();
 });
 
+// Add some debugging to track when users are saved
+userSchema.post('save', function(doc) {
+  console.log(`User saved successfully: ${doc.email} (${doc.uid})`);
+});
+
 const User = mongoose.model('User', userSchema);
 
 export default User;
