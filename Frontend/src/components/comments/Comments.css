@@ -1,0 +1,298 @@
+.comments-container {
+  padding: var(--space-4) 0;
+}
+
+.comments-header {
+  margin: 0 0 var(--space-4) 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.comments-counter {
+  background-color: var(--color-primary-light);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  padding: 2px 8px;
+  margin-left: var(--space-2);
+}
+
+.comment-list {
+  margin-bottom: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.comment-item {
+  padding: var(--space-4);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  margin-bottom: 0;
+  transition: all 0.3s ease;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.comment-item.deleting {
+  opacity: 0.5;
+  pointer-events: none;
+  transform: translateY(10px);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.comment-author {
+  display: flex;
+  align-items: center;
+}
+
+.author-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: var(--space-2);
+  box-shadow: var(--shadow-sm);
+}
+
+.author-initial {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--color-primary-light);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: var(--font-size-sm);
+  margin-right: var(--space-2);
+  box-shadow: var(--shadow-sm);
+}
+
+.author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.comment-date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.delete-comment-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  margin: 0;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.delete-comment-btn:hover {
+  color: var(--color-error);
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.delete-icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.comment-content {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.comment-form-container {
+  margin-top: var(--space-4);
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-input {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  margin-bottom: var(--space-3);
+  transition: all 0.2s ease;
+  background-color: var(--color-surface);
+}
+
+.comment-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  outline: none;
+}
+
+.comment-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.post-comment-btn {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: all 0.2s ease;
+}
+
+.post-comment-btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.post-comment-btn:disabled {
+  background-color: var(--color-primary-light);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.comment-loading {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--color-primary);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.comment-error {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: var(--color-error);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.error-icon {
+  font-size: var(--font-size-lg);
+}
+
+.no-comments {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-6);
+  font-style: italic;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: var(--radius-lg);
+}
+
+.retry-btn {
+  margin-left: var(--space-2);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  transition: all 0.2s ease;
+}
+
+.retry-btn:hover {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .comment-item {
+    background-color: var(--color-surface-dark);
+    border-color: var(--color-border-dark);
+  }
+  
+  .author-initial {
+    background-color: var(--color-primary-dark);
+  }
+  
+  .comment-input {
+    background-color: var(--color-surface-dark);
+    border-color: var(--color-border-dark);
+    color: var(--color-text-dark);
+  }
+  
+  .no-comments {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+  
+  .delete-comment-btn:hover {
+    background-color: rgba(220, 38, 38, 0.2);
+  }
+  
+  .retry-btn {
+    background-color: var(--color-surface-dark);
+    border-color: var(--color-border-dark);
+    color: var(--color-text-dark);
+  }
+  
+  .loading-spinner {
+    border-color: rgba(255, 255, 255, 0.1);
+    border-top-color: var(--color-primary);
+  }
+}
