@@ -1,22 +1,37 @@
-const express = require('express');
+import express from 'express';
+import { 
+  createProject, 
+  getUserProjects, 
+  getProjectById,
+  updateProject,
+  inviteUserToProject,
+  removeUserFromProject,
+  deleteProject
+} from '../controllers/projectController.js';
+import { authenticateToken } from '../middleware/auth.js';
+
 const router = express.Router();
-const projectController = require('../controllers/projectController');
-const { protect } = require('../middleware/authMiddleware');
-const { checkProjectAccess, checkProjectOwnership } = require('../middleware/projectAccessMiddleware');
 
-// All routes are protected
-router.use(protect);
+// Debug middleware
+const debugAuth = (req, res, next) => {
+  console.log('Auth Debug - Headers:', req.headers);
+  console.log('Auth Debug - User:', req.user);
+  next();
+};
 
-// Project routes
-router.get('/', projectController.getProjects);
-router.post('/', projectController.createProject);
-router.get('/:projectId', checkProjectAccess, projectController.getProject);
-router.put('/:projectId', checkProjectOwnership, projectController.updateProject);
-router.delete('/:projectId', checkProjectOwnership, projectController.deleteProject);
+// All routes need authentication
+router.use(authenticateToken);
+router.use(debugAuth); // Add debug middleware
 
-// Project member routes
-router.post('/:projectId/invite', checkProjectOwnership, projectController.inviteUser);
-router.post('/accept-invitation', projectController.acceptInvitation);
-router.delete('/:projectId/members', checkProjectOwnership, projectController.removeUser);
+// Project CRUD routes
+router.post('/', createProject);
+router.get('/', getUserProjects);
+router.get('/:projectId', getProjectById);
+router.put('/:projectId', updateProject);
+router.delete('/:projectId', deleteProject);
 
-module.exports = router;
+// Project member management
+router.post('/:projectId/invite', inviteUserToProject);
+router.delete('/:projectId/members/:userId', removeUserFromProject);
+
+export default router;
