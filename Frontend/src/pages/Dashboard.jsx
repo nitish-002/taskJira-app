@@ -73,13 +73,13 @@ function Dashboard() {
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-4 space-y-6">
+            <div className="lg:col-span-10 space-y-6">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-100 p-6 hover:shadow-purple-100/50 transition-all duration-300">
                 <AssignedTasks />
               </div>
             </div>
 
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-10  ">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-100 p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold text-purple-900">Your Projects</h2>

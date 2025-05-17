@@ -1,13 +1,10 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { getUserNotifications } from "../../services/automationService";
 
 function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, signOut } = useAuth();
-  const [latestNotification, setLatestNotification] = useState(null);
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -21,24 +18,6 @@ function Sidebar() {
       console.error("Failed to sign out:", error);
     }
   };
-
-  useEffect(() => {
-    const fetchLatestNotification = async () => {
-      try {
-        const notifications = await getUserNotifications();
-        if (notifications.length > 0) {
-          setLatestNotification(notifications[0]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch notifications:", err);
-      }
-    };
-
-    fetchLatestNotification();
-    // Poll for new notifications every minute
-    const interval = setInterval(fetchLatestNotification, 60000);
-    return () => clearInterval(interval);
-  }, []);
 
   if (!currentUser) return null;
 
@@ -58,7 +37,7 @@ function Sidebar() {
             <path d="M14 12a1 1 0 012 0v4a1 1 0 01-2 0v-4z" />
           </svg>
           <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
-            TaskBoard Pro
+            CurTer
           </span>
         </Link>
       </div>
@@ -112,34 +91,6 @@ function Sidebar() {
           </svg>
           Projects
         </Link>
-
-        {/* Latest Notification */}
-        {latestNotification && (
-          <Link
-            to="/profile?tab=notifications"
-            className="mt-4 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-100 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200 group"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 mt-1">
-                {latestNotification.type === "TASK" && <span>📝</span>}
-                {latestNotification.type === "BADGE" && <span>🏆</span>}
-                {latestNotification.type === "PROJECT" && <span>📂</span>}
-                {latestNotification.type === "SYSTEM" && <span>ℹ️</span>}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-purple-900 dark:text-purple-100 mb-0.5 truncate">
-                  {latestNotification.title}
-                </p>
-                <p className="text-xs text-purple-600 dark:text-purple-300 line-clamp-2">
-                  {latestNotification.message}
-                </p>
-              </div>
-              {!latestNotification.isRead && (
-                <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0"></div>
-              )}
-            </div>
-          </Link>
-        )}
       </div>
 
       {/* User Profile Section */}
