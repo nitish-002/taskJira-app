@@ -12,19 +12,21 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
   const [authStatus, setAuthStatus] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     // Check token validity
     const tokenStatus = checkToken();
     setAuthStatus(tokenStatus);
     
-    async function fetchProjects() {
+    async function initializeData() {
       try {
         // Test authentication first
         const authTest = await testAuthentication();
         console.log('Auth test result:', authTest);
         
         if (authTest.success) {
+          setIsAuthenticated(true);
           const projectsData = await getUserProjects();
           setProjects(projectsData.slice(0, 4)); // Show only the first 4 projects
         }
@@ -36,7 +38,7 @@ function Dashboard() {
     }
 
     if (currentUser && token) {
-      fetchProjects();
+      initializeData();
     } else {
       setLoading(false);
     }
@@ -79,7 +81,7 @@ function Dashboard() {
             {/* Assigned Tasks Section */}
             <div className="lg:col-span-10 space-y-6">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-100 p-6 hover:shadow-purple-100/50 transition-all duration-300">
-                <AssignedTasks />
+                <AssignedTasks isReady={isAuthenticated} />
               </div>
             </div>
 

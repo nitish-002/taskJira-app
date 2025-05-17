@@ -4,13 +4,15 @@ import { getUserAssignedTasks } from '../../services/taskService';
 import { format } from 'date-fns';
 import './Dashboard.css';
 
-function AssignedTasks() {
+function AssignedTasks({ isReady }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
+      if (!isReady) return;
+      
       try {
         setLoading(true);
         const data = await getUserAssignedTasks();
@@ -25,7 +27,7 @@ function AssignedTasks() {
     };
 
     fetchTasks();
-  }, []);
+  }, [isReady]);
 
   const formatDueDate = (dateString) => {
     if (!dateString) return 'No due date';
