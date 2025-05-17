@@ -10,6 +10,7 @@ import AutomationList from '../automations/AutomationList';
 import { useAuth } from '../../context/AuthContext';
 import { getTaskIdFromUrl } from '../../utils/urlUtils';
 import './Projects.css';
+import Sidebar from '../layout/Sidebar';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -127,122 +128,139 @@ function ProjectDetail() {
   }
   
   return (
-    <div className="project-detail-container">
-      <div className="project-detail-header">
-        <div className="back-button" onClick={() => navigate('/projects')}>
-          &larr; Back to Projects
-        </div>
-        
-        {isEditing ? (
-          <div className="project-edit-form">
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="project-title-input"
-              placeholder="Project Title"
-            />
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="project-description-input"
-              placeholder="Project Description"
-              rows={3}
-            ></textarea>
-            <div className="edit-actions">
-              <button 
-                className="cancel-btn" 
-                onClick={() => setIsEditing(false)}
-              >
-                Cancel
-              </button>
-              <button 
-                className="save-btn" 
-                onClick={handleSaveChanges}
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="project-info">
-            <h1>{project?.title}</h1>
-            <p className="project-description">{project?.description}</p>
-            {isProjectOwner() && (
-              <div className="project-actions">
-                <button 
-                  className="edit-btn" 
-                  onClick={() => setIsEditing(true)}
-                >
-                  Edit Project
-                </button>
-                <button 
-                  className="delete-btn" 
-                  onClick={handleDeleteProject}
-                >
-                  Delete Project
-                </button>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-emerald-50">
+      <Sidebar />
+      <div className="md:ml-64">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Header Section */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-100 p-6 mb-6">
+            <button 
+              onClick={() => navigate('/projects')}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-600 bg-white border border-purple-200 rounded-lg hover:bg-purple-50 dark:text-purple-300 dark:border-purple-700 dark:hover:bg-purple-900/20 transition-colors duration-200 mb-4"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Projects
+            </button>
+
+            {isEditing ? (
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full text-3xl font-bold px-4 py-2 rounded-lg border border-purple-200 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 transition-colors duration-200"
+                  placeholder="Project Title"
+                />
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-purple-200 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 transition-colors duration-200"
+                  placeholder="Project Description"
+                  rows={3}
+                ></textarea>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="flex items-center justify-center px-4 py-2 text-sm font-medium text-purple-600 bg-white border border-purple-200 rounded-lg hover:bg-purple-50 dark:text-purple-300 dark:border-purple-700 dark:hover:bg-purple-900/20 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveChanges}
+                    className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-700 hover:to-emerald-700 rounded-lg transition-colors duration-200"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-emerald-600">
+                  {project?.title}
+                </h1>
+                <p className="text-slate-600 mt-2">{project?.description}</p>
+                {isProjectOwner() && (
+                  <div className="flex gap-3 mt-4">
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="flex items-center justify-center px-4 py-2 text-sm font-medium text-purple-600 bg-white border border-purple-200 rounded-lg hover:bg-purple-50 dark:text-purple-300 dark:border-purple-700 dark:hover:bg-purple-900/20 transition-colors duration-200"
+                    >
+                      Edit Project
+                    </button>
+                    <button
+                      onClick={handleDeleteProject}
+                      className="flex items-center justify-center px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 dark:text-red-300 dark:border-red-700 dark:hover:bg-red-900/20 transition-colors duration-200"
+                    >
+                      Delete Project
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
-      </div>
-      
-      <div className="project-members-section">
-        <div className="section-header">
-          <h2>Project Members</h2>
-          {isProjectOwner() && (
-            <button 
-              className="invite-btn" 
-              onClick={() => setShowInviteModal(true)}
-            >
-              + Invite Member
-            </button>
+
+          {/* Members Section */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-100 p-6 mb-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-purple-900">Project Members</h2>
+              {isProjectOwner() && (
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="flex items-center justify-center px-4 py-2 text-sm font-medium text-purple-600 bg-white border border-purple-200 rounded-lg hover:bg-purple-50 dark:text-purple-300 dark:border-purple-700 dark:hover:bg-purple-900/20 transition-colors duration-200"
+                >
+                  + Invite Member
+                </button>
+              )}
+            </div>
+            <MembersList
+              members={project?.members || []}
+              projectId={projectId}
+              onMemberRemoved={fetchProject}
+              isOwner={isProjectOwner()}
+            />
+          </div>
+
+          {/* Tasks Section */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-100 p-6 mb-6">
+            {project && (
+              <Kanban
+                project={project}
+                isOwner={isProjectOwner()}
+              />
+            )}
+          </div>
+            
+          {/* Automations Section */}
+          {project && isProjectOwner() && (
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-100 p-6">
+              <AutomationList
+                project={project}
+                isOwner={isProjectOwner()}
+              />
+            </div>
+          )}
+
+          {/* Modals */}
+          {showInviteModal && (
+            <InviteMemberModal
+              projectId={projectId}
+              onClose={() => setShowInviteModal(false)}
+              onMemberInvited={handleMemberInvited}
+            />
+          )}
+
+          {/* Task detail modal */}
+          {selectedTask && (
+            <TaskDetailModal
+              task={selectedTask}
+              onClose={handleTaskModalClosed}
+              onTaskUpdated={fetchProject}
+            />
           )}
         </div>
-        <MembersList 
-          members={project?.members || []} 
-          projectId={projectId} 
-          onMemberRemoved={fetchProject} 
-          isOwner={isProjectOwner()}
-        />
       </div>
-      
-      {showInviteModal && (
-        <InviteMemberModal
-          projectId={projectId}
-          onClose={() => setShowInviteModal(false)}
-          onMemberInvited={handleMemberInvited}
-        />
-      )}
-
-      {/* Add Kanban board below the members section */}
-      {project && (
-        <div className="project-tasks-section">
-          <Kanban 
-            project={project} 
-            isOwner={isProjectOwner()}
-          />
-        </div>
-      )}
-      
-      {project && isProjectOwner() && (
-        <div className="project-automations-section">
-          <AutomationList 
-            project={project} 
-            isOwner={isProjectOwner()} 
-          />
-        </div>
-      )}
-      
-      {/* Task detail modal */}
-      {selectedTask && (
-        <TaskDetailModal
-          task={selectedTask}
-          onClose={handleTaskModalClosed}
-          onTaskUpdated={fetchProject}
-        />
-      )}
     </div>
   );
 }
