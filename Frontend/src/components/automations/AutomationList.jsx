@@ -99,7 +99,7 @@ function AutomationList({ project, isOwner }) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-purple-900">Workflow Automations</h2>
+        <h2 className="text-xl font-semibold text-purple-900">Automate Task</h2>
         {isOwner && (
           <button 
             onClick={() => setShowNewAutomationForm(true)}
