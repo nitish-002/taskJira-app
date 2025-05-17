@@ -68,46 +68,49 @@ function EditStatusesModal({ project, onClose, onStatusesUpdated }) {
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Edit Project Statuses</h2>
+          <h2>Edit Project Statuses ({statuses.length} total)</h2>
           <button className="close-btn" onClick={onClose}>&times;</button>
         </div>
-        
+
         <form onSubmit={handleSubmit}>
           {error && <div className="error-message">{error}</div>}
-          
-          <div className="status-list">
-            {statuses.map((status, index) => (
-              <div key={index} className="status-item">
-                <span>{status}</span>
-                <div className="status-actions">
-                  <button 
-                    type="button"
-                    className="icon-btn"
-                    onClick={() => handleMoveUp(index)}
-                    disabled={index === 0}
-                  >
-                    ↑
-                  </button>
-                  <button 
-                    type="button"
-                    className="icon-btn"
-                    onClick={() => handleMoveDown(index)}
-                    disabled={index === statuses.length - 1}
-                  >
-                    ↓
-                  </button>
-                  <button 
-                    type="button"
-                    className="icon-btn remove"
-                    onClick={() => handleRemoveStatus(index)}
-                  >
-                    ×
-                  </button>
+
+          <div className="status-list-container">
+            <div className="status-list">
+              {statuses.map((status, index) => (
+                <div key={index} className="status-item">
+                  <span className="status-name">{status}</span>
+                  <div className="status-actions">
+                    <button
+                      type="button"
+                      className="icon-btn"
+                      onClick={() => handleMoveUp(index)}
+                      disabled={index === 0}
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      className="icon-btn"
+                      onClick={() => handleMoveDown(index)}
+                      disabled={index === statuses.length - 1}
+                    >
+                      ↓
+                    </button>
+                    <button
+                      type="button"
+                      className="icon-btn remove"
+                      onClick={() => handleRemoveStatus(index)}
+                      disabled={statuses.length <= 1}
+                    >
+                      ×
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-          
+
           <div className="add-status-form">
             <div className="form-row">
               <input
@@ -115,21 +118,19 @@ function EditStatusesModal({ project, onClose, onStatusesUpdated }) {
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value)}
                 placeholder="New status name"
+                maxLength={50}
               />
-              <button 
+              <button
                 type="button"
                 className="add-status-btn"
                 onClick={handleAddStatus}
+                disabled={!newStatus.trim()}
               >
-                Add
+                Add Status
               </button>
             </div>
           </div>
-          
-          <div className="note">
-            <strong>Note:</strong> Tasks in removed statuses will be moved to the first status.
-          </div>
-          
+
           <div className="modal-actions">
             <button 
               type="button" 

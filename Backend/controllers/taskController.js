@@ -358,7 +358,8 @@ export const updateProjectStatuses = async (req, res) => {
     const { projectId } = req.params;
     const { statuses } = req.body;
     const { uid } = req.user;
-    
+
+    // Verify that the project exists
     const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
@@ -371,37 +372,48 @@ export const updateProjectStatuses = async (req, res) => {
     }
     
     // Validate statuses array
-    if (!Array.isArray(statuses) || statuses.length === 0) {
-      return res.status(400).json({ message: 'Statuses must be a non-empty array of strings.' });
+    if (!Array.isArray(statuses)) {
+      return res.status(400).json({ message: 'Statuses must be an array' });
     }
-    
-    // Make sure all tasks with statuses not in the new list are moved to a default status
-    const defaultStatus = statuses[0];
+
+    // Clean and validate statuses
+    const cleanedStatuses = statuses
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    // Ensure unique statuses
+    if (new Set(cleanedStatuses).size !== cleanedStatuses.length) {
+      return res.status(400).json({ message: 'All status names must be unique' });
+    }
+
+    // Get all tasks that need status updates
     const tasksToUpdate = await Task.find({
       projectId,
-      status: { $nin: statuses }
+      status: { $nin: cleanedStatuses }
     });
+
+    // Update tasks to default status in batches of 100
+    const batchSize = 100;
+    const defaultStatus = cleanedStatuses[0];
     
-    // Update tasks with outdated statuses
-    if (tasksToUpdate.length > 0) {
+    for (let i = 0; i < tasksToUpdate.length; i += batchSize) {
+      const batch = tasksToUpdate.slice(i, i + batchSize);
       await Task.updateMany(
-        { 
-          projectId,
-          status: { $nin: statuses }
-        },
+        { _id: { $in: batch.map(t => t._id) } },
         { status: defaultStatus }
       );
     }
-    
-    // Update project statuses
-    project.statuses = statuses;
+
+    // Update project with new statuses
+    project.statuses = cleanedStatuses;
     await project.save();
-    
-    res.status(200).json({ 
-      message: 'Project statuses updated successfully', 
+
+    res.status(200).json({
+      message: 'Project statuses updated successfully',
       project,
       tasksUpdated: tasksToUpdate.length
     });
+
   } catch (error) {
     console.error('Error updating project statuses:', error);
     res.status(500).json({ message: 'Error updating project statuses', error: error.message });

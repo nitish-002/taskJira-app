@@ -58,11 +58,13 @@
   display: flex;
   gap: var(--space-4);
   overflow-x: auto;
-  padding-bottom: var(--space-4);
+  padding: var(--space-4);
   scroll-padding: var(--space-4);
   scrollbar-width: thin;
   min-height: 600px;
-  padding-left: 2px;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .kanban-board::-webkit-scrollbar {
@@ -77,6 +79,50 @@
 .kanban-board::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.2);
   border-radius: var(--radius-full);
+}
+
+.kanban-column {
+  flex: 0 0 300px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+}
+
+.kanban-column:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background-color: var(--color-primary);
+  opacity: 0.1;
+  border-radius: 50%;
+}
+
+.kanban-scroll-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.kanban-scroll-shadow.left {
+  left: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+}
+
+.kanban-scroll-shadow.right {
+  right: 0;
+  background: linear-gradient(to left, rgba(0,0,0,0.1), transparent);
+}
+
+.kanban-board:hover .kanban-scroll-shadow {
+  opacity: 1;
 }
 
 .kanban-column {
@@ -346,37 +392,49 @@
 }
 
 /* Status Management */
+.status-list-container {
+  position: relative;
+  max-height: 400px;
+  overflow: hidden;
+  margin: 1rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
 .status-list {
-  margin-bottom: var(--space-4);
-  max-height: 300px;
+  max-height: 400px;
   overflow-y: auto;
+  padding: 1rem;
+  scroll-behavior: smooth;
 }
 
 .status-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-3);
-  background-color: var(--color-surface);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-2);
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: var(--radius-md);
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
 }
 
-.status-item:hover {
-  box-shadow: var(--shadow-sm);
-  transform: translateY(-1px);
+.status-item:last-child {
+  margin-bottom: 0;
 }
 
 .status-name {
   font-weight: 500;
-  color: var(--color-text);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .status-actions {
   display: flex;
-  gap: var(--space-1);
+  gap: 0.25rem;
 }
 
 .icon-btn {

@@ -36,7 +36,21 @@ const projectSchema = new mongoose.Schema({
   }],
   statuses: {
     type: [String],
-    default: ['To Do', 'In Progress', 'Done']
+    default: ['To Do', 'In Progress', 'Review', 'Done'],
+    validate: [
+      {
+        validator: function(arr) {
+          return arr.length > 0;
+        },
+        message: 'Project must have at least one status'
+      },
+      {
+        validator: function(arr) {
+          return new Set(arr).size === arr.length;
+        },
+        message: 'All status names must be unique'
+      }
+    ]
   },
   createdAt: {
     type: Date,
