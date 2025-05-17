@@ -28,13 +28,16 @@ function Sidebar() {
         <Link to="/" className="flex items-center">
           <svg
             className="h-8 w-8 text-primary-600"
-            fill="currentColor"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path d="M5 3a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h14v14H5V5z" />
-            <path d="M10 8a1 1 0 000 2h4a1 1 0 000-2h-4z" />
-            <path d="M8 12a1 1 0 012 0v4a1 1 0 01-2 0v-4z" />
-            <path d="M14 12a1 1 0 012 0v4a1 1 0 01-2 0v-4z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
+            />
           </svg>
           <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
             CurTer
