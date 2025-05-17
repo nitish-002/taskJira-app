@@ -1,8 +1,9 @@
-# Taskboard Pro
+# CurTer
 
 A modern project management and collaboration platform designed to help teams organize, track, and manage their tasks efficiently with real-time updates and workflow automation.
 
-![image](https://github.com/user-attachments/assets/ae051b0b-d2f6-4366-ba0f-8ee84dbbd8bc)
+![image](https://github.com/user-attachments/assets/d3b34d53-a882-49b7-a5aa-8390149b850d)
+
 
 
 ---
@@ -21,25 +22,40 @@ A modern project management and collaboration platform designed to help teams or
 
 ## Introduction
 
-Taskboard Pro is a full-stack task management application built with **React**, **Node.js**, **Express**, and **MongoDB**.  
-It enables teams to collaborate on projects, manage tasks using a Kanban-style board, communicate via comments, and automate repetitive workflows.
+CurTer is a full-stack task management application built with **React**, **Node.js**, **Express**, and **MongoDB**.  
+It empowers teams to efficiently collaborate on projects, manage tasks through a Kanban-style board, streamline communication with comments, and automate routine workflows with ease.
 
 The application offers:
 
-- A responsive UI for all devices
-- Real-time updates via WebSockets
-- Customizable workflows and automation rules
-- Detailed analytics to track project progress
+- A responsive and intuitive UI across all devices  
+- Real-time task updates using WebSockets  
+- Customizable automation rules and project workflows  
+- Insightful analytics to monitor and boost project performance  
+
 
 ---
 
 ## Features
 
 ### Project Management
+- **Project Creation & Organization:** Secure Login with Google Auth via Firebase
+  ![image](https://github.com/user-attachments/assets/3dd3c7fa-bb2d-4f18-bd09-4da2f16e3848)
+
 
 - **Project Creation & Organization:** Create new projects, add descriptions, and organize work.
+  ![image](https://github.com/user-attachments/assets/2e2aa80b-c774-4089-8f17-be0275fbecf1)
+
+
 - **Customizable Statuses:** Define your own workflow stages (To Do, In Progress, Review, Done, etc.).
-- **Team Collaboration:** Invite team members and assign roles (owner, member).
+ ![image](https://github.com/user-attachments/assets/5d15d5cd-45c0-4a90-80e6-8d44d66e941c)
+
+  
+- **Create and Assign Task:** Invite team members and assign roles (owner, member).
+-  ![image](https://github.com/user-attachments/assets/7b5a2118-6e7d-4455-b93a-672b1f54ba58)
+
+-  **Real Time Comment:** add comments in realTime
+    ![image](https://github.com/user-attachments/assets/819a9750-f065-4819-a139-c5a9e44f3242)
+
 
 ### Task Management
 
@@ -54,6 +70,8 @@ The application offers:
 - **Responsive Design:** Works on desktop, tablet, and mobile.
 - **Notifications:** In-app for assignments, mentions, and status changes.
 - **Dark Mode Support:** Adapts to system preferences.
+- ![image](https://github.com/user-attachments/assets/be24a7e5-01b2-4e94-bb17-a8c387815969)
+
 
 ### Workflow Automation
 
@@ -61,6 +79,8 @@ The application offers:
 - **Triggers:** Status change, assignment change, due date passed.
 - **Actions:** Move tasks, assign badges, send notifications.
 - **Achievement Badges:** Gamification elements.
+  ![image](https://github.com/user-attachments/assets/a4128423-67ed-40af-93c6-cbdc830bbd72)
+
 
 ### Security & Access Control
 
@@ -77,51 +97,82 @@ The application offers:
 Authorization: Bearer <your-jwt-token>
 ```
 
-### Projects API
+### 📁 Projects API
 
-| Endpoint                                 | Method | Description                        | Request Body             | Response                  |
-|-------------------------------------------|--------|------------------------------------|--------------------------|---------------------------|
-| `/api/projects`                          | GET    | Get all projects for current user  | -                        | Array of project objects  |
-| `/api/projects`                          | POST   | Create a new project               | `{title, description}`   | Created project object    |
-| `/api/projects/:projectId`               | GET    | Get a specific project             | -                        | Project object            |
-| `/api/projects/:projectId`               | PUT    | Update a project                   | `{title, description}`   | Updated project object    |
-| `/api/projects/:projectId`               | DELETE | Delete a project                   | -                        | Success message           |
-| `/api/projects/:projectId/invite`        | POST   | Invite user to project             | `{email}`                | Success message           |
-| `/api/projects/:projectId/members/:userId`| DELETE| Remove user from project           | -                        | Success message           |
+- **GET** `/api/projects`  
+  → Fetch all projects belonging to the current user.
 
-### Tasks API
+- **POST** `/api/projects`  
+  → Create a new project.  
+  **Body:**
+  ```json
+  {
+    "title": "Project Title",
+    "description": "Project Description"
+  }
+  | `DELETE` | `/api/projects/:projectId` | Delete a project | - |
+| `POST` | `/api/projects/:projectId/invite` | Invite a user to the project | ```json
+{
+  "email": "user@example.com"
+}
+``` |
+| `DELETE` | `/api/projects/:projectId/members/:userId` | Remove a user from a project | - |
 
-| Endpoint                                 | Method | Description                        | Request Body                               | Response                |
-|-------------------------------------------|--------|------------------------------------|--------------------------------------------|-------------------------|
-| `/api/tasks`                             | POST   | Create a new task                  | `{title, description, projectId, status, assignee, dueDate, priority, isUrgent}` | Created task object     |
-| `/api/tasks/project/:projectId`          | GET    | Get all tasks for a project        | -                                          | Array of task objects   |
-| `/api/tasks/user/assigned`               | GET    | Get tasks assigned to current user | -                                          | Array of task objects   |
-| `/api/tasks/:taskId`                     | GET    | Get a specific task                | -                                          | Task object             |
-| `/api/tasks/:taskId`                     | PUT    | Update a task                      | Task fields to update                      | Updated task object     |
-| `/api/tasks/:taskId/status`              | PATCH  | Update task status                 | `{status}`                                 | Updated task object     |
-| `/api/tasks/:taskId`                     | DELETE | Delete a task                      | -                                          | Success message         |
-| `/api/tasks/project/:projectId/statuses` | PUT    | Update project statuses            | `{statuses: []}`                           | Updated project object  |
+## ✅ Tasks API
 
-### Comments API
+| Method | Endpoint | Description | Request Body |
+|--------|----------|-------------|-------------|
+| `POST` | `/api/tasks` | Create a new task | ```json
+{
+  "title": "Task Title",
+  "description": "Details...",
+  "projectId": "123",
+  "status": "To Do",
+  "assignee": "userId",
+  "dueDate": "YYYY-MM-DD",
+  "priority": "High",
+  "isUrgent": true
+}
+``` |
+| `GET` | `/api/tasks/project/:projectId` | Get all tasks in a project | - |
+| `GET` | `/api/tasks/user/assigned` | Get tasks assigned to the current user | - |
+| `GET` | `/api/tasks/:taskId` | Fetch a specific task by ID | - |
+| `PUT` | `/api/tasks/:taskId` | Update task details | - |
+| `PATCH` | `/api/tasks/:taskId/status` | Update only the status of a task | ```json
+{
+  "status": "In Progress"
+}
+``` |
+| `DELETE` | `/api/tasks/:taskId` | Delete a task | - |
+| `PUT` | `/api/tasks/project/:projectId/statuses` | Customize the task statuses for a project | ```json
+{
+  "statuses": ["To Do", "Review", "Done"]
+}
+``` |
 
-| Endpoint                                 | Method | Description                        | Request Body         | Response                  |
-|-------------------------------------------|--------|------------------------------------|----------------------|---------------------------|
-| `/api/comments`                          | POST   | Create a comment                   | `{taskId, content}`  | Created comment object    |
-| `/api/comments/task/:taskId`             | GET    | Get comments for a task            | -                    | Array of comment objects  |
-| `/api/comments/:commentId`               | DELETE | Delete a comment                   | -                    | Success message           |
+## 💬 Comments API
 
-### Automations API
+| Method | Endpoint | Description | Request Body |
+|--------|----------|-------------|-------------|
+| `POST` | `/api/comments` | Add a comment to a task | ```json
+{
+  "taskId": "123",
+  "content": "This task needs revision."
+}
+``` |
+| `GET` | `/api/comments/task/:taskId` | Fetch all comments for a task | - |
+| `DELETE` | `/api/comments/:commentId` | Delete a comment | - |
 
-| Endpoint                                 | Method | Description                        | Request Body         | Response                  |
-|-------------------------------------------|--------|------------------------------------|----------------------|---------------------------|
-| `/api/automations`                       | POST   | Create automation rule             | Automation object    | Created automation object |
-| `/api/automations/project/:projectId`    | GET    | Get automations for project        | -                    | Array of automation objects|
-| `/api/automations/:automationId`         | PUT    | Update automation                  | Automation fields    | Updated automation object |
-| `/api/automations/:automationId`         | DELETE | Delete automation                  | -                    | Success message           |
-| `/api/automations/badges`                | GET    | Get user badges                    | -                    | Array of badge objects    |
-| `/api/automations/notifications`         | GET    | Get user notifications             | -                    | Array of notification objects|
+## ⚙️ Automations API
 
----
+| Method | Endpoint | Description | Request Body |
+|--------|----------|-------------|-------------|
+| `POST` | `/api/automations` | Create a new automation rule | - |
+| `GET` | `/api/automations/project/:projectId` | Get all automations for a project | - |
+| `PUT` | `/api/automations/:automationId` | Update an automation rule | - |
+| `DELETE` | `/api/automations/:automationId` | Delete an automation rule | - |
+| `GET` | `/api/automations/badges` | Get all achievement badges for the user | - |
+| `GET` | `/api/automations/notifications` | Fetch all automation-related notifications | - |
 
 ## Database Schema
 
@@ -258,32 +309,8 @@ Authorization: Bearer <your-jwt-token>
 
 ## Database Schema Diagram
 
-```
-┌─────────────┐       ┌─────────────┐
-│  Project    │       │   Task      │
-├─────────────┤       ├─────────────┤
-│ _id         │<──────│ projectId   │
-│ members[]   │       │ assignee    │
-│ statuses[]  │       │ ...         │
-└─────┬───────┘       └─────┬───────┘
-      │                     │
-      ▼                     ▼
-┌─────────────┐       ┌─────────────┐
-│ Automation  │<──────│ Comment     │
-├─────────────┤       ├─────────────┤
-│ projectId   │       │ projectId   │
-│ action      │       │ taskId      │
-│ ...         │       │ ...         │
-└─────┬───────┘       └─────┬───────┘
-      │                     │
-      ▼                     ▼
-┌─────────────┐       ┌─────────────┐
-│   Badge     │<──────│ Notification│
-└─────────────┘       └─────────────┘
-```
 
----
-
+![image](https://github.com/user-attachments/assets/f9ee752b-4f05-42ce-adb9-099052c359e0)
 ## System Architecture
 
 ```
@@ -301,6 +328,7 @@ Authorization: Bearer <your-jwt-token>
 │Authentication│
 └──────────────┘
 ```
+
 
 ---
 
@@ -344,19 +372,12 @@ Authorization: Bearer <your-jwt-token>
 
     **Backend (.env):**
     ```
-    MONGODB_URI=your_mongodb_connection_string
-    JWT_SECRET=your_jwt_secret
-    FIREBASE_CONFIG=your_firebase_config
-    FRONTEND_URL=http://localhost:5173
+    copy grom .env.example
     ```
 
     **Frontend (.env):**
     ```
-    VITE_API_URL=http://localhost:5000/api
-    VITE_FIREBASE_API_KEY=your_firebase_api_key
-    VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-    VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
-    ```
+    copy grom .env.example
 
 5. **Start the development servers**
     ```bash
